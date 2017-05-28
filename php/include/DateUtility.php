@@ -10,6 +10,7 @@
  * @version    1.0
  */
 
+date_default_timezone_set("Asia/Kolkata");
 class DateUtility 
 {
     const DATE_FORMAT = 'Y-m-d';

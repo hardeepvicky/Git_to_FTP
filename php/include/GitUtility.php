@@ -42,12 +42,11 @@ class GitUtility
         return strtolower(trim($branchname));
     }
     
-    public function getCommits($branch)
+    public function getCommits()
     {
         $current = getcwd();
         chdir($this->path);
-        exec("git log $branch", $logs);
-		
+        exec("git log", $logs);
 		$data = array();
 		$i = 0;
 		$commit_name = $author_name = $datetime = "";

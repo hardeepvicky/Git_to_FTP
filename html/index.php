@@ -52,7 +52,7 @@
                     <thead>
                         <tr>
                             <th style="width:5%">
-                                <input type="checkbox" class="chk-select-all" data-href=".chk-child" />                                
+                                #
                             </th>
                             <th>Commit Message</th>
                             <th>Author</th>
@@ -63,7 +63,7 @@
                         <?php $i = 0; foreach($commits as $k => $commit): $i++; ?>
                         <tr class="commit_<?= $commit['commit'] ?>">
                             <td>
-                                <input type="checkbox" class="chk-child" name="commits[<?= $k ?>]" value="<?= $k ?>" />
+                                <?= $i ?>
                             </td>
                             <td>
                                 <?= $commit['msg'] ?>
@@ -306,36 +306,15 @@
         $("#ftp-link-upload").click(function ()
         {
             errorObj.hide();
-            if ($(".chk-child:checked").length == 0)
-            {
-                BootstrapDialog.show({
-                    type: BootstrapDialog.TYPE_DANGER,
-                    title: 'Error',
-                    message: 'Please Select at least one commit',
-                });
-
-                return false;
-            }
             
             var post_commits = [];
-            $(".chk-child").each(function()
+            for(var i in commits)
             {
-                var v = $(this).val();                
-                if(this.checked)
-                {
-                    post_commits.push({
-                        data : commits[v],
-                        will_upload : 1
-                    });
-                }
-                else
-                {
-                    post_commits.push({
-                        data : commits[v],
-                        will_upload : 0
-                    });
-                }
-            });
+                post_commits.push({
+                    data : commits[i],
+                    will_upload : 1
+                });
+            }
             
             start_process(post_commits);
         });

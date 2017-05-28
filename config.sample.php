@@ -9,3 +9,6 @@ define("FTP_SERVER", "");
 define("FTP_USER", "");
 define("FTP_PASSWORD", "");
 define("FTP_PROJECT_PATH", "");
+
+// in case of on going project code is already on server
+define("LAST_SYNC_DATETME", NULL);
