@@ -12,6 +12,11 @@ if (!FileUtility::createFolder(BASE_PATH))
 	die("failed to create path " . BASE_PATH);
 }
 
+if (!FileUtility::createFolder(BASE_PATH . "temp"))
+{
+	die("failed to create path " . BASE_PATH . "temp");
+}
+
 $load_file = isset($_GET['load_file']) ? $_GET['load_file'] : "index";
 $load_file .= ".php";
 
