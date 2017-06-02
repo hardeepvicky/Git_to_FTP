@@ -14,9 +14,18 @@
     }
 </style>
 
-<div id="progress" >
-    <div class="text-right">
-        <span class="percentage">0%</span> complete
+<div id="progress">
+    <div class="row">
+        <div class="col-md-4">
+            Total Data : <strong><span class="total-bytes">0</span></strong>,
+            Sent : <strong><span class="upload-bytes">0</span></strong>
+        </div>
+        <div class="col-md-4 text-center">
+            Upload Speed : <strong><span class="upload-speed">0</span></strong>
+        </div>
+        <div class="col-md-4 text-right">
+            <strong><span class="percentage">0%</span></strong> complete
+        </div>
     </div>
     <div class="progress">    
         <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 1%">
@@ -212,27 +221,30 @@
                 }
                 
                 var tbody = "";
-                var k = Object.keys(data);
-                if (k.length > 0)
+                var d = Object.keys(data['dirs']);
+                var f = Object.keys(data['files']);
+                if (d.length > 0 || f.length > 0)
                 {
-                    for(var i in data)
+                    for(var i in data['dirs'])
                     {
-                        if (data[i]['obj'] == "." || data[i]['obj'] == "..")
+                        var obj = data['dirs'][i];
+                        
+                        if (obj['name'] == "." || obj['name'] == "..")
                         {
                             continue;
                         }
                         
                         tbody += "<tr><td>";
+                        tbody += "<a href='javascript:void(0);' class='ftp-link-dir'>" + obj['name'] + "</a>";
+                        tbody += "</td></tr>";
+                    }
+                    
+                    for(var i in data['files'])
+                    {
+                        var obj = data['files'][i];
                         
-                        if (data[i]['is_dir'] == "1")
-                        {
-                            tbody += "<a href='javascript:void(0);' class='ftp-link-dir'>" + data[i]['obj'] + "</a>";
-                        }
-                        else
-                        {
-                            tbody += data[i]['obj'];
-                        }
-                         
+                        tbody += "<tr><td>";
+                        tbody += obj['name'];
                         tbody += "</td></tr>";
                     }
                 }
@@ -350,6 +362,7 @@
         track_process(filename);
     }
     
+    var last_upload_size = 0;
     function track_process(filename)
     {
         if (!process_contiue)
@@ -380,6 +393,21 @@
                 $("#progress .progress-bar").css("width", per + "%");
                 $("#progress .percentage").html(per + "%");
                 
+                var diff = data['upload_bytes'] - last_upload_size;
+                
+                if (diff == 0 && last_upload_size > 0)
+                {
+                }
+                else
+                {
+                    $("#progress .upload-speed").html(niceBytes(diff) + "/sec");
+                }
+                
+                $("#progress .total-bytes").html(niceBytes(data['total_bytes']));
+                $("#progress .upload-bytes").html(niceBytes(data['upload_bytes']));
+                
+                last_upload_size = data['upload_bytes'];
+                
                 for (var i in data.commit_list)
                 {
                     var commit = data.commit_list[i];
@@ -399,5 +427,22 @@
             process_contiue = false;
             errorObj.html(data.responseText).show();
         });
+    }
+    
+    function niceBytes(bytes, count)
+    {
+        if (typeof count == "undefined")
+        {
+            count = 0;
+        }
+        
+        if (bytes > 1024)
+        {
+            return niceBytes(Math.round(bytes / 1024, 2), count + 1)
+        }
+        
+        var sizes = ["Bytes","Kb","Mb", "Gb"];
+        
+        return bytes + " " + sizes[count];
     }
 </script>

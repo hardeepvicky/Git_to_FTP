@@ -15,7 +15,8 @@ foreach($commit_data as $i => $commit)
         foreach($commit['data']['files'] as $file)
         {
             $file_arr[$file['file']] = array(
-                "file" => $file['file'],                
+                "file" => $file['file'],     
+                "filesize" => $file['is_exist'] == 1 ? filesize(GIT_PATH . $file['file']) : 0,
                 "will_delete" => $file['is_exist'] == 0 ? 1 : 0,
                 "is_done" => 0,
             );

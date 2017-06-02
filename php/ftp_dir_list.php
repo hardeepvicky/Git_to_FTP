@@ -7,15 +7,27 @@ try
 
     $list = $ftp->getList($path);
     
-    $data = array();
+    $data = array(
+        "dirs" => array(),
+        "files" => array()
+    );
     foreach ($list as $obj)
     {
-        $data[] = array(
-            "obj" => $obj,
-            "is_dir" => $ftp->isDir($path . $obj) ? 1 : 0
-        );
+        if ($ftp->isDir($path . $obj))
+        {
+            $data["dirs"][] = array(
+                "name" => $obj
+            );
+        }
+        else
+        {
+            $data["files"][] = array(
+                "name" => $obj
+            );
+        }
     }
-
+    sort($data["dirs"]);
+    sort($data["files"]);
     echo json_encode($data);
 }
 catch (Exception $ex)
