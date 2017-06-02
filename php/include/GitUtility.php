@@ -52,16 +52,16 @@ class GitUtility
 		$commit_name = $author_name = $datetime = "";
 		foreach($logs as $str)
 		{
-			if (strpos($str, "commit") !== false)
+			if (str_contain($str, "commit", 0, strlen("commit")))
 			{
 				$i++;
 				$data[$i]["commit"] = trim(substr($str, strpos($str, "commit") + strlen("commit")));				
 			}
-			else if (strpos($str, "Author:") !== false)
+			else if (str_contain($str, "Author:", 0, strlen("Author:")))
 			{
 				$data[$i]["author"] = trim(substr($str, strpos($str, "Author:") + strlen("Author:")));				
 			}		
-			else if (strpos($str, "Date:") !== false)
+			else if (str_contain($str, "Date:", 0, strlen("Date:")))
 			{
 				$data[$i]["datetime"] = DateUtility::getDate(trim(substr($str, strpos($str, "Date:") + strlen("Date:"))));
 			}
@@ -74,6 +74,14 @@ class GitUtility
 				}
 			}
 		}
+        
+        foreach($data as $k => $arr)
+        {
+            if (!isset($arr['commit']) || !isset($arr['datetime']) || !isset($arr['author']))
+            {
+                unset($data[$k]);
+            }
+        }
 		
         chdir($current);
 		return $data;
