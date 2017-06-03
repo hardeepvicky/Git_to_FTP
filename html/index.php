@@ -12,19 +12,44 @@
     {
         display: none;
     }
+
+    .loading:after 
+    {
+      overflow: hidden;
+      display: inline-block;
+      vertical-align: bottom;
+      -webkit-animation: ellipsis steps(4,end) 900ms infinite;      
+      animation: ellipsis steps(4,end) 900ms infinite;
+      content: "\2026"; /* ascii code for the ellipsis character */
+      width: 0px;
+    }
+
+    @keyframes ellipsis {
+      to {
+        width: 1.25em;    
+      }
+    }
+
+    @-webkit-keyframes ellipsis {
+      to {
+        width: 1.25em;    
+      }
+    }
+
 </style>
 
 <div id="progress">
     <div class="row">
         <div class="col-md-4">
             Total Data : <strong><span class="total-bytes">0</span></strong>,
-            Sent : <strong><span class="upload-bytes">0</span></strong>
+            Sent : <strong><span class="upload-bytes">0</span></strong>            
         </div>
         <div class="col-md-4 text-center">
-            Upload Speed : <strong><span class="upload-speed">0</span></strong>
+            Upload Speed : <strong><span class="upload-speed">0</span></strong>            
         </div>
         <div class="col-md-4 text-right">
-            <strong><span class="percentage">0%</span></strong> complete
+            <strong><span class="percentage">0%</span></strong> complete            
+            <span class="loading"></span>
         </div>
     </div>
     <div class="progress">    
@@ -362,11 +387,11 @@
         track_process(filename);
     }
     
-    var last_upload_size = 0;
     function track_process(filename)
     {
         if (!process_contiue)
         {
+            $(".loading").hide();
             return;
         }
         
@@ -393,16 +418,7 @@
                 $("#progress .progress-bar").css("width", per + "%");
                 $("#progress .percentage").html(per + "%");
                 
-                var diff = data['upload_bytes'] - last_upload_size;
-                
-                if (diff == 0 && last_upload_size > 0)
-                {
-                }
-                else
-                {
-                    $("#progress .upload-speed").html(niceBytes(diff) + "/sec");
-                }
-                
+                $("#progress .upload-speed").html(niceBytes(data['upload_speed']) + "/sec");
                 $("#progress .total-bytes").html(niceBytes(data['total_bytes']));
                 $("#progress .upload-bytes").html(niceBytes(data['upload_bytes']));
                 
@@ -420,6 +436,10 @@
                     setTimeout(function() {
                         track_process(filename);
                     }, 1000);                    
+                }
+                else
+                {
+                    $(".loading").hide();
                 }
             }
         }).fail(function (data)

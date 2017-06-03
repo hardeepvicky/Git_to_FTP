@@ -12,11 +12,17 @@ foreach($commit_data as $i => $commit)
 {
     if ($commit['will_upload'])
     {
+        if ( !isset($commit['data']['files']))
+        {
+            continue;
+        }
+        
         foreach($commit['data']['files'] as $file)
         {
             $file_arr[$file['file']] = array(
                 "file" => $file['file'],     
                 "filesize" => $file['is_exist'] == 1 ? filesize(GIT_PATH . $file['file']) : 0,
+                "upload_time" => 0,
                 "will_delete" => $file['is_exist'] == 0 ? 1 : 0,
                 "is_done" => 0,
             );
@@ -35,33 +41,38 @@ try
     {
         if ($commit['will_upload'])
         {
-            foreach($commit['data']['files'] as $file_obj)
+            if (isset($commit['data']['files']))
             {
-                $file = $file_obj['file'];
-                if ($file_arr[$file]['is_done'] == 0)
+                foreach($commit['data']['files'] as $file_obj)
                 {
-                    if ($file_arr[$file]['will_delete'] == 1)
+                    $file = $file_obj['file'];
+                    if ($file_arr[$file]['is_done'] == 0)
                     {
-                        if ($ftp->delete(FTP_PROJECT_PATH . $file))
+                        if ($file_arr[$file]['will_delete'] == 1)
                         {
-                            $file_arr[$file]["is_done"] = 1;
-                            CsvUtility::writeCSV($file_csv, $file_arr, true);
+                            if ($ftp->delete(FTP_PROJECT_PATH . $file))
+                            {
+                                $file_arr[$file]["is_done"] = 1;
+                                CsvUtility::writeCSV($file_csv, $file_arr, true);
+                            }
+                            else
+                            {
+                                throw new Exception("Failed to delete file on FTP Server");
+                            }
                         }
                         else
                         {
-                            throw new Exception("Failed to delete file on FTP Server");
-                        }
-                    }
-                    else
-                    {
-                        if ($ftp->upload(GIT_PATH . $file, FTP_PROJECT_PATH . $file))
-                        {
-                            $file_arr[$file]["is_done"] = 1;
-                            CsvUtility::writeCSV($file_csv, $file_arr, true);
-                        }
-                        else
-                        {
-                            throw new Exception("Failed to upload file on FTP Server");
+                            $start = time();
+                            if ($ftp->upload(GIT_PATH . $file, FTP_PROJECT_PATH . $file))
+                            {
+                                $file_arr[$file]["upload_time"] = time() - $start;
+                                $file_arr[$file]["is_done"] = 1;
+                                CsvUtility::writeCSV($file_csv, $file_arr, true);
+                            }
+                            else
+                            {
+                                throw new Exception("Failed to upload file on FTP Server");
+                            }
                         }
                     }
                 }
