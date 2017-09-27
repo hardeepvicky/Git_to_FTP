@@ -40,8 +40,8 @@ class FtpUtility
     public function isDir($path)
     {
         $current = ftp_pwd($this->conn);
-        $path = trim(trim($path), "/");
         $path = str_replace("\\", "/", $path);
+        $path = trim(trim($path), "/");
         $paths = explode("/", $path);
         
         foreach($paths as $path)
@@ -60,8 +60,8 @@ class FtpUtility
     public function createFolder($path)
     {
         $current = ftp_pwd($this->conn);
-        $path = trim(trim($path), "/");
         $path = str_replace("\\", "/", $path);
+        $path = trim(trim($path), "/");
         $paths = explode("/", $path);
         
         foreach($paths as $k => $path)
@@ -80,10 +80,15 @@ class FtpUtility
                     ftp_chdir($this->conn, $current);
                     return false;
                 }
+                
+                ftp_chdir($this->conn, $path);
+                ftp_chmod($this->conn, 0777, $path);
             }
         }
         
+        //change dir to default state 
         ftp_chdir($this->conn, $current);
+        
         if (empty($paths))
         {
             return false;

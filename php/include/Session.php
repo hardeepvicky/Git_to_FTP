@@ -29,12 +29,12 @@ class Session
         return self::has("flash." . $key);
     }
     
-    public function writeFlash($key, $val)
+    public static function writeFlash($key, $val)
     {
         self::write("flash." . $key, $val);
     }
     
-    public function readFlash($key)
+    public static function readFlash($key)
     {
         $key = "flash." . $key;
         
