@@ -26,6 +26,9 @@ foreach($commits as $k => $commit)
     
     $commits[$k]["files"] = array();
 	$files = $git->getFilesOfCommit($commit['commit']);
+    
+    chdir(GIT_PATH);
+    
     foreach($files as $file)
     {
         $commits[$k]["files"][] = array(

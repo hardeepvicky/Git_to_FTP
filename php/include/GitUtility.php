@@ -9,8 +9,9 @@ class GitUtility
     
     public function getBranchList()
     {
+        $current = getcwd();
         chdir($this->path);
-        exec("git branch", $list);
+        exec($this->path . " git branch", $list);
         
         $result = array();
         
@@ -26,6 +27,7 @@ class GitUtility
             }
         }
         
+        chdir($current);
         return $result;
     }
     
@@ -89,24 +91,13 @@ class GitUtility
 	
 	public function getFilesOfCommit($commit)
 	{
+        $current = getcwd();
 		chdir($this->path);
-        $cmd = 'git show --no-commit-id --name-only -r ' . $commit;
+        
+        $cmd = 'git diff-tree --no-commit-id --name-only -r ' . $commit;
         exec($cmd, $files);
         
-		$flag = true;
-		foreach($files as $k => $file)
-		{
-			if (strpos($file, "commit ") !== false)
-			{
-				$flag = false;
-			}
-		
-			if (!$flag)
-			{
-				unset($files[$k]);
-			}
-		}
-		
+		chdir($current);
 		return $files;
 	}
 }
